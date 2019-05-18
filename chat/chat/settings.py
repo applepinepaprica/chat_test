@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphene_django',
-    'private_chat'
+    'private_chat',
 ]
 
 MIDDLEWARE = [

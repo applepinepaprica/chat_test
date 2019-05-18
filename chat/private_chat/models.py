@@ -6,3 +6,4 @@ class Message(models.Model):
     sender = models.ForeignKey(User, null=False, on_delete=models.PROTECT, related_name='+')
     receiver = models.ForeignKey(User, null=False, on_delete=models.PROTECT, related_name='+')
     text = models.TextField()
+    datetime = models.DateTimeField(auto_now_add=True)
