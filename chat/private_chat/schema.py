@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.db.models import Q
+from graphql_relay.node.node import from_global_id
 from .models import Message
 from django.contrib.auth.models import User
 
@@ -19,7 +20,7 @@ class UserNode(DjangoObjectType):
 
 
 class Query(graphene.ObjectType):
-    messages = graphene.List(MessageNode, receiver_id=graphene.Int())
+    messages = graphene.List(MessageNode, receiver_id=graphene.String())
     me = graphene.Field(UserNode)
     users = graphene.List(UserNode)
 
@@ -29,7 +30,7 @@ class Query(graphene.ObjectType):
         if user.is_anonymous:
             raise Exception('Not logged in!')
 
-        receiver = User.objects.get(id=receiver_id)
+        receiver = User.objects.get(id=from_global_id(receiver_id)[1])
         messages = Message.objects.filter(Q(sender=user, receiver=receiver) | Q(sender=receiver, receiver=user))
         return messages
 
@@ -49,7 +50,7 @@ class SendMessage(graphene.relay.ClientIDMutation):
     message = graphene.Field(MessageNode)
 
     class Input:
-        receiver_id = graphene.Int()
+        receiver_id = graphene.String()
         text = graphene.String()
 
     @staticmethod
@@ -60,7 +61,7 @@ class SendMessage(graphene.relay.ClientIDMutation):
 
         message = Message(
             sender=user,
-            receiver=User.objects.get(id=input.get('receiver_id')),
+            receiver=User.objects.get(id=from_global_id(input.get('receiver_id'))[1]),
             text=input.get('text')
         )
         message.save()
