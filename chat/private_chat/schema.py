@@ -1,4 +1,5 @@
 import graphene
+from graphene import relay
 from graphene_django import DjangoObjectType
 from django.db.models import Q
 from graphql_relay.node.node import from_global_id
@@ -19,13 +20,23 @@ class UserNode(DjangoObjectType):
         only_fields = ['username', 'email']
 
 
+class MessageConnection(relay.Connection):
+    class Meta:
+        node = MessageNode
+
+
+class UserConnection(relay.Connection):
+    class Meta:
+        node = UserNode
+
+
 class Query(graphene.ObjectType):
-    messages = graphene.List(MessageNode, receiver_id=graphene.String())
+    messages = relay.ConnectionField(MessageConnection, receiver_id=graphene.String())
     me = graphene.Field(UserNode)
-    users = graphene.List(UserNode)
+    users = relay.ConnectionField(UserConnection)
 
     @staticmethod
-    def resolve_messages(self, info, receiver_id):
+    def resolve_messages(self, info, receiver_id, **kwargs):
         user = info.context.user
         if user.is_anonymous:
             raise Exception('Not logged in!')
@@ -35,14 +46,14 @@ class Query(graphene.ObjectType):
         return messages
 
     @staticmethod
-    def resolve_me(self, info):
+    def resolve_me(self, info, **kwargs):
         user = info.context.user
         if user.is_anonymous:
             raise Exception('Not logged in!')
         return user
 
     @staticmethod
-    def resolve_users(self, info):
+    def resolve_users(self, info, **kwargs):
         return User.objects.all()
 
 
