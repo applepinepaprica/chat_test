@@ -46,7 +46,7 @@ class Query(graphene.ObjectType):
         return User.objects.all()
 
 
-class SendMessage(graphene.relay.ClientIDMutation):
+class SaveMessage(graphene.relay.ClientIDMutation):
     message = graphene.Field(MessageNode)
 
     class Input:
@@ -66,7 +66,7 @@ class SendMessage(graphene.relay.ClientIDMutation):
         )
         message.save()
 
-        return SendMessage(message=message)
+        return SaveMessage(message=message)
 
 
 class CreateUser(graphene.relay.ClientIDMutation):
@@ -90,5 +90,5 @@ class CreateUser(graphene.relay.ClientIDMutation):
 
 
 class Mutation(graphene.AbstractType):
-    send_message = SendMessage.Field()
+    save_message = SaveMessage.Field()
     create_user = CreateUser.Field()
