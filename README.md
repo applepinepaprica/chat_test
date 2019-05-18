@@ -33,56 +33,6 @@ python manage.py runserver
 python manage.py createsuperuser
 ```
 
-### Authentication:
-
-* Getting a token:
-```
-mutation {
-  tokenAuth(username: "user", password: "password") {
-    token
-  }
-}
-```
-
-* For auth use the token in Authorization HTTP header:
-```
-Authorization: JWT eyJ0eXAiOiJKV1QiLCJhbGciO
-```
-
-### Mutations:
-
-* Creating an user:
-```
-mutation {
-  createUser(input: {username: "user", password: "password", email: "email@gmail.com"}) {
-    user {
-      id
-      username
-      email
-    }
-  }
-}
-```
-
-* Saving a message:
-```
-mutation {
-  saveMessage(input: {receiverId: "VXNlck5vZGU6Mg==", text: "text"}) {
-    message {
-      id
-      text
-      sender {
-        username
-      }
-      receiver {
-        username
-      }
-      datetime
-    }
-  }
-}
-```
-
 ### Queries:
 
 * Getting info about the current user:
@@ -130,4 +80,53 @@ mutation {
     }
   }
 }
+```
+
+### Mutations:
+
+* Creating an user:
+```
+mutation {
+  createUser(input: {username: "user", password: "password", email: "email@gmail.com"}) {
+    user {
+      id
+      username
+      email
+    }
+  }
+}
+```
+
+* Saving a message:
+```
+mutation {
+  saveMessage(input: {receiverId: "VXNlck5vZGU6Mg==", text: "text"}) {
+    message {
+      id
+      text
+      sender {
+        username
+      }
+      receiver {
+        username
+      }
+      datetime
+    }
+  }
+}
+```
+### Authentication:
+
+* Getting a token:
+```
+mutation {
+  tokenAuth(username: "user", password: "password") {
+    token
+  }
+}
+```
+
+* For auth use the token in Authorization HTTP header:
+```
+Authorization: JWT eyJ0eXAiOiJKV1QiLCJhbGciO
 ```
