@@ -13,7 +13,7 @@ _A simple chat app_
 python3.6 -m venv venv
 source venv/bin/activate
 pip install django==2.1.4 graphene-django==2.2.0 django-filter==2.0.0 django-graphql-jwt==0.1.5
-cd limbo
+cd chat
 python manage.py migrate
 python manage.py runserver
 ```
@@ -23,7 +23,7 @@ http://localhost:8000/graphql
 
 ```
 source venv/bin/activate
-cd limbo
+cd chat
 python manage.py runserver
 ```
 
