@@ -11,6 +11,13 @@ class MessageNode(DjangoObjectType):
         interfaces = (graphene.relay.Node, )
 
 
+class UserNode(DjangoObjectType):
+    class Meta:
+        model = User
+        interfaces = (graphene.relay.Node, )
+        only_fields = ['username']
+
+
 class Query(graphene.ObjectType):
     messages = graphene.List(MessageNode, receiver_id=graphene.Int())
 
