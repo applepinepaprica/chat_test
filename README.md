@@ -33,6 +33,54 @@ python manage.py runserver
 python manage.py createsuperuser
 ```
 
+### Using:
+
+* Create an user using http://localhost:8000/graphql:
+```
+mutation {
+  createUser(input: {username: "user", password: "password", email: "email@gmail.com"}) {
+    user {
+      id
+      username
+      email
+    }
+  }
+}
+```
+
+* Get a token:
+```
+mutation {
+  tokenAuth(username: "user", password: "password") {
+    token
+  }
+}
+```
+
+* Using the token you can save a message:
+```
+curl \
+  -H "Content-Type:application/json" \
+  -H "Authorization:JWT $TOKEN" \
+  -d '{
+      "query": "mutation {saveMessage (input: {receiverId: \"$ID\", text: \"text\"}) {message {id text sender { username } receiver { username } datetime}}}"
+      ,"variables":null
+    }' \
+  -X POST 'http://localhost:8000/graphql/'  | python -m json.tool
+```
+
+* And get a chat with other user:
+```
+curl \
+  -H "Content-Type:application/json" \
+  -H "Authorization:JWT $TOKEN" \
+  -d '{
+      "query": "{messages (receiverId: \"$ID\") {edges {node {id text receiver { username } sender { username } datetime}}}}"
+      ,"variables":null
+    }' \
+  -X POST 'http://localhost:8000/graphql/'  | python -m json.tool
+```
+
 ### Queries:
 
 * Getting info about the current user:
@@ -44,6 +92,15 @@ python manage.py createsuperuser
     email
   }
 }
+
+curl \
+  -H "Content-Type:application/json" \
+  -H "Authorization:JWT $TOKEN" \
+  -d '{
+      "query": "{me {id username email}}"
+      ,"variables":null
+    }' \
+  -X POST 'http://localhost:8000/graphql/'  | python -m json.tool
 ```
 
 * Getting a chat with a particular user:
@@ -114,19 +171,4 @@ mutation {
     }
   }
 }
-```
-### Authentication:
-
-* Getting a token:
-```
-mutation {
-  tokenAuth(username: "user", password: "password") {
-    token
-  }
-}
-```
-
-* For auth use the token in Authorization HTTP header:
-```
-Authorization: JWT eyJ0eXAiOiJKV1QiLCJhbGciO
 ```
