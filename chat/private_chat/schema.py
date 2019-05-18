@@ -21,6 +21,7 @@ class UserNode(DjangoObjectType):
 class Query(graphene.ObjectType):
     messages = graphene.List(MessageNode, receiver_id=graphene.Int())
 
+    @staticmethod
     def resolve_messages(self, info, receiver_id):
         user = info.context.user
         if user.is_anonymous:
@@ -38,6 +39,7 @@ class SendMessage(graphene.relay.ClientIDMutation):
         receiver_id = graphene.Int()
         text = graphene.String()
 
+    @staticmethod
     def mutate_and_get_payload(root, info, **input):
         user = info.context.user
         if user.is_anonymous:
