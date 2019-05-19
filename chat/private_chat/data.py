@@ -73,5 +73,5 @@ def assert_test_with_auth(query, expected, token):
         'HTTP_AUTHORIZATION': f'JWT {token}'
     }
     client = django.test.Client()
-    response = client.get(f'/graphql/', query, content_type='application_json', **headers)
+    response = client.get('/graphql/', query, content_type='application_json', **headers)
     assert response.json() == expected
