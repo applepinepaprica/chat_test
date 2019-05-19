@@ -25,7 +25,6 @@ def initialize():
         receiver=user2,
         text="Text"
     )
-
     message1.save()
 
     message2 = Message(
@@ -33,7 +32,6 @@ def initialize():
         receiver=user1,
         text="Text"
     )
-
     message2.save()
 
 
@@ -46,7 +44,6 @@ def get_token():
         }'''
     client = Client(schema)
     result = client.execute(query)
-
     return result.get('data').get('tokenAuth').get('token')
 
 
