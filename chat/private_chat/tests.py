@@ -7,6 +7,7 @@ class Tests(TestCase):
     def setUp(self):
         initialize()
         self.token = get_token()
+        self.receiver_id = get_receiver_id()
 
     def test_create_user(self):
         query = '''
@@ -75,3 +76,39 @@ class Tests(TestCase):
           }
         }
         assert_test_without_auth(query, expected)
+
+    def test_get_messages(self):
+        query = {"query":
+                 "{messages(receiverId: \"%s\"){edges {node {text receiver {username} sender {username}}}}}"
+                 % self.receiver_id}
+        expected = {
+          "data": {
+            "messages": {
+              "edges": [
+                {
+                  "node": {
+                    "text": "Text",
+                    "sender": {
+                      "username": "user1"
+                    },
+                    "receiver": {
+                      "username": "user2"
+                    }
+                  }
+                },
+                {
+                  "node": {
+                    "text": "Text",
+                    "sender": {
+                      "username": "user2"
+                    },
+                    "receiver": {
+                      "username": "user1"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+        assert_test_with_auth(query, expected, self.token)

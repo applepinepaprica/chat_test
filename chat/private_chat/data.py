@@ -47,6 +47,21 @@ def get_token():
     return result.get('data').get('tokenAuth').get('token')
 
 
+def get_receiver_id():
+    query = '''{
+      users(last: 1) {
+        edges {
+          node {
+            id
+          }
+        }
+      }
+    }'''
+    client = Client(schema)
+    result = client.execute(query)
+    return result.get('data').get('users').get('edges')[0].get('node').get('id')
+
+
 def assert_test_without_auth(query, expected):
     client = Client(schema)
     result = client.execute(query)
