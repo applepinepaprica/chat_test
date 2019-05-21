@@ -5,6 +5,7 @@ from graphql_relay.node.node import from_global_id
 from .models import Message, Dialogue
 from django.contrib.auth.models import User
 from django.db.models import Q
+from .permission_checkers import login_required
 
 
 class MessageNode(DjangoObjectType):
@@ -47,11 +48,10 @@ class Query(graphene.ObjectType):
     users = relay.ConnectionField(UserConnection)
     my_dialogues = relay.ConnectionField(DialogueConnection)
 
+    @login_required
     @staticmethod
     def resolve_messages(self, info, dialogue_id, **kwargs):
         user = info.context.user
-        if user.is_anonymous:
-            raise Exception('Not logged in!')
 
         dialogue = Dialogue.objects.get(id=from_global_id(dialogue_id)[1])
         if dialogue.user1 != user and dialogue.user2 != user:
@@ -60,23 +60,19 @@ class Query(graphene.ObjectType):
         messages = Message.objects.filter(dialogue=dialogue)
         return messages
 
+    @login_required
     @staticmethod
     def resolve_me(self, info, **kwargs):
-        user = info.context.user
-        if user.is_anonymous:
-            raise Exception('Not logged in!')
-        return user
+        return info.context.user
 
     @staticmethod
     def resolve_users(self, info, **kwargs):
         return User.objects.all()
 
+    @login_required
     @staticmethod
     def resolve_my_dialogues(self, info, **kwargs):
         user = info.context.user
-        if user.is_anonymous:
-            raise Exception('Not logged in!')
-
         dialogues = Dialogue.objects.filter(Q(user1=user) | Q(user2=user))
         return dialogues
 
@@ -88,11 +84,10 @@ class SaveMessage(graphene.relay.ClientIDMutation):
         dialogue_id = graphene.String()
         text = graphene.String()
 
+    @login_required
     @staticmethod
     def mutate_and_get_payload(root, info, **input):
         user = info.context.user
-        if user.is_anonymous:
-            raise Exception('Not logged in!')
 
         dialogue = Dialogue.objects.get(id=from_global_id(input.get('dialogue_id'))[1])
         if dialogue.user1 != user and dialogue.user2 != user:
@@ -114,11 +109,10 @@ class CreateDialogue(graphene.relay.ClientIDMutation):
     class Input:
         receiver_id = graphene.String()
 
+    @login_required
     @staticmethod
     def mutate_and_get_payload(root, info, **input):
         user = info.context.user
-        if user.is_anonymous:
-            raise Exception('Not logged in!')
 
         dialogue = Dialogue(
             user1=user,
