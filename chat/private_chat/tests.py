@@ -7,7 +7,7 @@ class Tests(TestCase):
     def setUp(self):
         initialize()
         self.token = get_token()
-        self.receiver_id = get_receiver_id()
+        self.dialogue_id = get_dialogue_id(self.token)
 
     def test_create_user(self):
         query = '''
@@ -79,8 +79,8 @@ class Tests(TestCase):
 
     def test_get_messages(self):
         query = {"query":
-                 "{messages(receiverId: \"%s\"){edges {node {text receiver {username} sender {username}}}}}"
-                 % self.receiver_id}
+                 "{messages(dialogueId: \"%s\"){edges {node {text sender {username}}}}}"
+                 % self.dialogue_id}
         expected = {
           "data": {
             "messages": {
@@ -90,9 +90,6 @@ class Tests(TestCase):
                     "text": "Text",
                     "sender": {
                       "username": "user1"
-                    },
-                    "receiver": {
-                      "username": "user2"
                     }
                   }
                 },
@@ -101,9 +98,6 @@ class Tests(TestCase):
                     "text": "Text",
                     "sender": {
                       "username": "user2"
-                    },
-                    "receiver": {
-                      "username": "user1"
                     }
                   }
                 }

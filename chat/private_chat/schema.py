@@ -4,6 +4,7 @@ from graphene_django import DjangoObjectType
 from graphql_relay.node.node import from_global_id
 from .models import Message, Dialogue
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 
 class MessageNode(DjangoObjectType):
@@ -35,10 +36,16 @@ class UserConnection(relay.Connection):
         node = UserNode
 
 
+class DialogueConnection(relay.Connection):
+    class Meta:
+        node = DialogueNode
+
+
 class Query(graphene.ObjectType):
     messages = relay.ConnectionField(MessageConnection, dialogue_id=graphene.String())
     me = graphene.Field(UserNode)
     users = relay.ConnectionField(UserConnection)
+    my_dialogues = relay.ConnectionField(DialogueConnection)
 
     @staticmethod
     def resolve_messages(self, info, dialogue_id, **kwargs):
@@ -63,6 +70,15 @@ class Query(graphene.ObjectType):
     @staticmethod
     def resolve_users(self, info, **kwargs):
         return User.objects.all()
+
+    @staticmethod
+    def resolve_my_dialogues(self, info, **kwargs):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception('Not logged in!')
+
+        dialogues = Dialogue.objects.filter(Q(user1=user) | Q(user2=user))
+        return dialogues
 
 
 class SaveMessage(graphene.relay.ClientIDMutation):
