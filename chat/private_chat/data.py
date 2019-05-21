@@ -20,6 +20,8 @@ def initialize():
     user2.set_password("password")
     user2.save()
 
+
+
     message1 = Message(
         sender=user1,
         receiver=user2,
