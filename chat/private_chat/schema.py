@@ -5,7 +5,7 @@ from graphql_relay.node.node import from_global_id
 from .models import Message, Dialogue
 from django.contrib.auth.models import User
 from django.db.models import Q
-from .permission_checkers import login_required
+from .permission_checkers import login_required, is_owner
 
 
 class MessageNode(DjangoObjectType):
@@ -49,14 +49,10 @@ class Query(graphene.ObjectType):
     my_dialogues = relay.ConnectionField(DialogueConnection)
 
     @login_required
+    @is_owner
     @staticmethod
     def resolve_messages(self, info, dialogue_id, **kwargs):
-        user = info.context.user
-
         dialogue = Dialogue.objects.get(id=from_global_id(dialogue_id)[1])
-        if dialogue.user1 != user and dialogue.user2 != user:
-            raise Exception('Forbidden!')
-
         messages = Message.objects.filter(dialogue=dialogue)
         return messages
 
@@ -85,13 +81,11 @@ class SaveMessage(graphene.relay.ClientIDMutation):
         text = graphene.String()
 
     @login_required
+    @is_owner
     @staticmethod
     def mutate_and_get_payload(root, info, **input):
         user = info.context.user
-
         dialogue = Dialogue.objects.get(id=from_global_id(input.get('dialogue_id'))[1])
-        if dialogue.user1 != user and dialogue.user2 != user:
-            raise Exception('Forbidden!')
 
         message = Message(
             sender=user,
