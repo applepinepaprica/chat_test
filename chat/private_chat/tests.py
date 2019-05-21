@@ -33,7 +33,7 @@ class Tests(TestCase):
         assert_test_without_auth(query, expected)
 
     def test_get_me(self):
-        query = {"query": "{me {username email}}"}
+        query = "{me {username email}}"
         expected = {
           "data": {
             "me": {
@@ -78,9 +78,7 @@ class Tests(TestCase):
         assert_test_without_auth(query, expected)
 
     def test_get_messages(self):
-        query = {"query":
-                 "{messages(dialogueId: \"%s\"){edges {node {text sender {username}}}}}"
-                 % self.dialogue_id}
+        query = "{messages(dialogueId: \"%s\"){edges {node {text sender {username}}}}}" % self.dialogue_id
         expected = {
           "data": {
             "messages": {

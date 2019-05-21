@@ -54,13 +54,9 @@ def get_token():
 
 
 def get_dialogue_id(token):
-    query = {"query": "{myDialogues(first: 1) {edges {node {id}}}}"}
-    headers = {
-        'HTTP_AUTHORIZATION': f'JWT {token}'
-    }
-    client = django.test.Client()
-    response = client.get('/graphql/', query, content_type='application_json', **headers)
-    return response.json().get('data').get('myDialogues').get('edges')[0].get('node').get('id')
+    query = "{myDialogues(first: 1) {edges {node {id}}}}"
+    result = request_with_auth(query, token)
+    return result.get('data').get('myDialogues').get('edges')[0].get('node').get('id')
 
 
 def assert_test_without_auth(query, expected):
@@ -70,9 +66,14 @@ def assert_test_without_auth(query, expected):
 
 
 def assert_test_with_auth(query, expected, token):
+    result = request_with_auth(query, token)
+    assert result == expected
+
+
+def request_with_auth(query, token):
     headers = {
         'HTTP_AUTHORIZATION': f'JWT {token}'
     }
     client = django.test.Client()
-    response = client.get('/graphql/', query, content_type='application_json', **headers)
-    assert response.json() == expected
+    result = client.get('/graphql/', {"query": query}, content_type='application_json', **headers)
+    return result.json()
