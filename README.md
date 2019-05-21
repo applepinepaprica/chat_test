@@ -75,7 +75,7 @@ curl \
   -H "Content-Type:application/json" \
   -H "Authorization:JWT $TOKEN" \
   -d '{
-      "query": "mutation {saveMessage (input: {dialogueId: \"$ID\", text: \"text\"}) {message {id text sender { username } receiver { username } datetime}}}"
+      "query": "mutation {saveMessage (input: {dialogueId: \"$ID\", text: \"text\"}) {message {id text sender { username } datetime}}}"
       ,"variables":null
     }' \
   -X POST 'http://localhost:8000/graphql/'  | python -m json.tool
@@ -87,7 +87,7 @@ curl \
   -H "Content-Type:application/json" \
   -H "Authorization:JWT $TOKEN" \
   -d '{
-      "query": "{messages (receiverId: \"$ID\") {edges {node {id text receiver { username } sender { username } datetime}}}}"
+      "query": "{messages (dialogueId: \"$ID\") {edges {node {id text sender { username } datetime}}}}"
       ,"variables":null
     }' \
   -X POST 'http://localhost:8000/graphql/'  | python -m json.tool
@@ -202,14 +202,11 @@ mutation {
 * Saving a message:
 ```
 mutation {
-  saveMessage(input: {receiverId: "VXNlck5vZGU6Mg==", text: "text"}) {
+  saveMessage(input: {dialogueId: "VXNlck5vZGU6Mg==", text: "text"}) {
     message {
       id
       text
       sender {
-        username
-      }
-      receiver {
         username
       }
       datetime
