@@ -57,13 +57,25 @@ mutation {
 }
 ```
 
-* Using the token you can save a message:
+* Using the token you can create a dialogue:
 ```
 curl \
   -H "Content-Type:application/json" \
   -H "Authorization:JWT $TOKEN" \
   -d '{
-      "query": "mutation {saveMessage (input: {receiverId: \"$ID\", text: \"text\"}) {message {id text sender { username } receiver { username } datetime}}}"
+      "query": "mutation {createDialogue(input:{receiverId:\"$ID\"}) {dialogue { id }}}"
+      ,"variables":null
+    }' \
+  -X POST 'http://localhost:8000/graphql/'  | python -m json.tool
+```
+
+* Save a message:
+```
+curl \
+  -H "Content-Type:application/json" \
+  -H "Authorization:JWT $TOKEN" \
+  -d '{
+      "query": "mutation {saveMessage (input: {dialogueId: \"$ID\", text: \"text\"}) {message {id text sender { username } receiver { username } datetime}}}"
       ,"variables":null
     }' \
   -X POST 'http://localhost:8000/graphql/'  | python -m json.tool
@@ -106,14 +118,11 @@ curl \
 * Getting a chat with a particular user:
 ```
 {
-  messages(receiverId: "VXNlck5vZGU6Mw==") {
+  messages(dialogueId: "VXNlck5vZGU6Mw==") {
     edges {
       node {
         id
         text
-        receiver {
-          username
-        }
         sender {
           username
         }
@@ -139,6 +148,25 @@ curl \
 }
 ```
 
+* Getting a list of dialogues:
+```
+{
+  myDialogues {
+    edges {
+      node {
+        id
+        user1 {
+          username
+        }
+        user2 {
+          username
+        }
+      }
+    }
+  }
+}
+```
+
 ### Mutations:
 
 * Creating an user:
@@ -149,6 +177,23 @@ mutation {
       id
       username
       email
+    }
+  }
+}
+```
+
+* Creating a dialogue:
+```
+mutation {
+  createDialogue(input: {receiverId: "VXNlck5vZGU6Mg=="}) {
+    dialogue {
+      id
+      user1 {
+        username
+      }
+      user2 {
+        username
+      }
     }
   }
 }
